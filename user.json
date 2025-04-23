@@ -1,0 +1,7 @@
+{
+    "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbIltTVEFGRl0iXSwic3ViIjoibmd1eWVudmFuYiIsImlhdCI6MTc0NTQwMDQxNCwiZXhwIjoxNzQ1NDE0ODE0fQ.Qv7xHLIM3av0X4VzOXh--MXyING5VFDzC2PRDjcHhj8",
+    "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbIltTVEFGRl0iXSwic3ViIjoibmd1eWVudmFuYiIsImlhdCI6MTc0NTQwMDQxNCwiZXhwIjoxNzQ1NDg2ODE0fQ.RyFe1fK1dHbMvvHsB9S6AX-zra0pQ_wwv-D5ETwFq_c",
+    "userId": 2,
+    "role": "STAFF",
+    "userName": "nguyenvanb"
+}
