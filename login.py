@@ -73,25 +73,40 @@ def show_login(main_root):
     password = password_entry.get()
     api_url = "http://localhost:8080/auth/log-in"  # Thay bằng URL API thực tế
     headers = {"Content-Type": "application/json"}  # Thêm header Content-Type
-    # Gửi yêu cầu POST đến API với thông tin đăng nhập và header
-    response = requests.post(api_url, json={"username": username, "password": password}, headers=headers)
-    # response.raise_for_status()  # Kiểm tra lỗi HTTP
-
-    # Xử lý phản hồi từ API
-    data = response.json()
-    if data.get("status") == 200:
-      # Lấy thông tin từ phản hồi
-      messagebox.showinfo("Thành công", "Đăng nhập thành công!")
-      user_data = data.get("data", {})
-      write_json(user_data, "user.json")  # Lưu thông tin vào file user.json
-      login_window.withdraw()  # Ẩn cửa sổ đăng nhập
-      api_url = "http://localhost:8080/admin/building-list"
-      data = fetch_api(api_url)
-      admin.show_admin()  # Gọi hàm show_admin từ file admin.py
-      return {"status": "success", "role": user_data.get("role")}
-    else:
-      messagebox.showerror("Thất bại", "Tài khoản hoặc mật khẩu không đúng!")
-      return {"status": "failure", "message": data.get("message", "Đăng nhập thất bại")}
+    
+    try:
+      # Gửi yêu cầu POST đến API với thông tin đăng nhập và header
+      response = requests.post(api_url, json={"username": username, "password": password}, headers=headers)
+      
+      # Xử lý phản hồi từ API
+      data = response.json()
+      if data.get("status") == 200:
+        # Lấy thông tin từ phản hồi
+        messagebox.showinfo("Thành công", "Đăng nhập thành công!")
+        user_data = data.get("data", {})
+        
+        # Import os và lấy đường dẫn tuyệt đối
+        import os
+        from utils import BASE_DIR
+        
+        # Lưu thông tin vào file user.json hiện có với đường dẫn tuyệt đối
+        user_file = os.path.join(BASE_DIR, "user.json")
+        write_json(user_data, user_file)
+        
+        login_window.withdraw()  # Ẩn cửa sổ đăng nhập
+        
+        # Lấy dữ liệu tòa nhà và lưu vào file data.json hiện có
+        api_url = "http://localhost:8080/admin/building-list"
+        buildings_data = fetch_api(api_url)
+        
+        admin.show_admin()  # Gọi hàm show_admin từ file admin.py
+        return {"status": "success", "role": user_data.get("role")}
+      else:
+        messagebox.showerror("Thất bại", "Tài khoản hoặc mật khẩu không đúng!")
+        return {"status": "failure", "message": data.get("message", "Đăng nhập thất bại")}
+    except Exception as e:
+      messagebox.showerror("Lỗi", f"Đã xảy ra lỗi: {e}")
+      return {"status": "failure", "message": str(e)}
     # Có thể thêm mã xác thực ở đây
     # Sau khi đăng nhập thành công, có thể đóng cửa sổ đăng nhập và hiển thị cửa sổ chính
 

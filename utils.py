@@ -1,10 +1,18 @@
 import json
 import requests
+import os
+
+# Lấy đường dẫn tuyệt đối đến thư mục chứa file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def read_json(filepath="data.json"):
     """
     Đọc dữ liệu từ file JSON.
     """
+    # Chuyển đổi thành đường dẫn tuyệt đối nếu chưa phải
+    if not os.path.isabs(filepath):
+        filepath = os.path.join(BASE_DIR, filepath)
+        
     try:
         with open(filepath, "r", encoding="utf-8") as file:
             return json.load(file)
@@ -19,13 +27,31 @@ def write_json(data, filepath):
     """
     Ghi dữ liệu vào file JSON.
     """
-    with open(filepath, "w", encoding="utf-8") as file:
-        json.dump(data, file, indent=4, ensure_ascii=False)
+    # Chuyển đổi thành đường dẫn tuyệt đối nếu chưa phải
+    if not os.path.isabs(filepath):
+        filepath = os.path.join(BASE_DIR, filepath)
+        
+    try:
+        # Đảm bảo thư mục chứa file tồn tại
+        directory = os.path.dirname(filepath)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory)
+            
+        # Ghi dữ liệu vào file
+        with open(filepath, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
+        print(f"Đã lưu dữ liệu vào file {filepath}")
+    except Exception as e:
+        print(f"Lỗi khi ghi file {filepath}: {e}")
 
 def get_access_token(filepath="user.json"):
     """
     Lấy accessToken từ file user.json.
     """
+    # Chuyển đổi thành đường dẫn tuyệt đối nếu chưa phải
+    if not os.path.isabs(filepath):
+        filepath = os.path.join(BASE_DIR, filepath)
+        
     try:
         data = read_json(filepath)
         return data.get("accessToken")
@@ -64,7 +90,11 @@ def fetch_api(api_url):
         response.raise_for_status()
         full_data = response.json()  # Dữ liệu trả về từ API
         buildings = full_data.get("data", [])  # Lấy danh sách tòa nhà từ key "data"
-        write_json(buildings, "data.json")  # Lưu danh sách tòa nhà vào file data.json
+        
+        # Sử dụng đường dẫn tuyệt đối cho file data.json
+        data_file = os.path.join(BASE_DIR, "data.json")
+        write_json(buildings, data_file)  # Lưu danh sách tòa nhà vào file data.json
+        
         return buildings
     except requests.RequestException as e:
         print(f"Lỗi khi gọi API: {e}")
