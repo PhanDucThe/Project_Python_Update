@@ -64,10 +64,16 @@ def getRole(filepath="user.json"):
     """
     Lấy giá trị role từ file JSON.
     """
+    # Chuyển đổi thành đường dẫn tuyệt đối nếu chưa phải
+    if not os.path.isabs(filepath):
+        filepath = os.path.join(BASE_DIR, filepath)
+        
     try:
         with open(filepath, "r", encoding="utf-8") as file:
             data = json.load(file)
-            return data.get("role")  # Lấy giá trị role từ file JSON
+            role = data.get("role")
+            print(f"Role from file: {role}")  # Debug: In ra role đọc từ file
+            return role  # Lấy giá trị role từ file JSON
     except FileNotFoundError:
         print(f"File {filepath} không tồn tại.")
         return None

@@ -99,7 +99,9 @@ def show_login(main_root):
         api_url = "http://localhost:8080/admin/building-list"
         buildings_data = fetch_api(api_url)
         
-        admin.show_admin()  # Gọi hàm show_admin từ file admin.py
+        # Lấy role từ user_data và truyền vào hàm show_admin
+        role = user_data.get("role")
+        admin.show_admin(role)  # Truyền role vào hàm show_admin
         return {"status": "success", "role": user_data.get("role")}
       else:
         messagebox.showerror("Thất bại", "Tài khoản hoặc mật khẩu không đúng!")
