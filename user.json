@@ -1,0 +1,7 @@
+{
+    "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbIltNQU5BR0VSXSJdLCJzdWIiOiJuZ3V5ZW52YW5hIiwiaWF0IjoxNzQ4MjI1OTQ2LCJleHAiOjE3NDgyNDAzNDZ9.iqlH46k2IgoYSgbDuHsEDHjhjQxklO3zo2QqLF_mnQE",
+    "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbIltNQU5BR0VSXSJdLCJzdWIiOiJuZ3V5ZW52YW5hIiwiaWF0IjoxNzQ4MjI1OTQ2LCJleHAiOjE3NDgzMTIzNDZ9.DLlyZ2Ily168JSTcPO5Go9u3iVfFspyRD9LEyh4jAcc",
+    "userId": 1,
+    "role": "MANAGER",
+    "userName": "nguyenvana"
+}

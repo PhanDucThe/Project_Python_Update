@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from PIL import Image, ImageTk
 import requests
@@ -6,6 +7,8 @@ import admin
 from tkinter import messagebox
 from utils import fetch_api
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+logo_path = os.path.join(current_dir, "logo-python.png")
 def show_login(main_root):
   login_window = tk.Toplevel(main_root)  # Tạo cửa sổ đăng nhập
   login_window.title("Đăng nhập")
@@ -37,7 +40,7 @@ def show_login(main_root):
 
   # Hiển thị ảnh
   try:
-    image = Image.open("C:/Users/Admin/Downloads/logo-python.png")  # Đường dẫn ảnh
+    image = Image.open(logo_path)  # Đường dẫn ảnh
     image = image.resize((600, 700))  # Điều chỉnh kích thước
     img_logo = ImageTk.PhotoImage(image)
         
