@@ -1,7 +1,7 @@
 {
-    "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbIltNQU5BR0VSXSJdLCJzdWIiOiJuZ3V5ZW52YW5hIiwiaWF0IjoxNzQ4MjI1OTQ2LCJleHAiOjE3NDgyNDAzNDZ9.iqlH46k2IgoYSgbDuHsEDHjhjQxklO3zo2QqLF_mnQE",
-    "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbIltNQU5BR0VSXSJdLCJzdWIiOiJuZ3V5ZW52YW5hIiwiaWF0IjoxNzQ4MjI1OTQ2LCJleHAiOjE3NDgzMTIzNDZ9.DLlyZ2Ily168JSTcPO5Go9u3iVfFspyRD9LEyh4jAcc",
-    "userId": 1,
-    "role": "MANAGER",
-    "userName": "nguyenvana"
+    "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbIltTVEFGRl0iXSwic3ViIjoibmd1eWVudmFuYiIsImlhdCI6MTc0ODM5OTkzNywiZXhwIjoxNzQ4NDE0MzM3fQ.PHPgSCGOu2yZBAZJDgMXkBji5oWuyzZ6aMgIC-6zxTI",
+    "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbIltTVEFGRl0iXSwic3ViIjoibmd1eWVudmFuYiIsImlhdCI6MTc0ODM5OTkzNywiZXhwIjoxNzQ4NDg2MzM3fQ.Q6sIC5kacxeLePsRnwDWjOhpl2dQQk6I0eNVloB4kc4",
+    "userId": 2,
+    "role": "STAFF",
+    "userName": "nguyenvanb"
 }

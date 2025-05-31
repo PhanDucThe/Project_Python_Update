@@ -1,15 +1,11 @@
-version: '3.8'
 services:
-  building-management-app:    build:
-      context: ./ProjectUpdate      dockerfile: Dockerfile
-    container_name: building-management-app    volumes:
-      - ./ProjectUpdate:/app    environment:
+  building-management-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: building-management-app
+    volumes:
+      - .:/app
+    environment:
       - DISPLAY=${DISPLAY}
-    network_mode: "host"  # Cho phép kết nối đến X server trên host
-
-
-
-
-
-
-
+    network_mode: "host"

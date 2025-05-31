@@ -14,6 +14,20 @@
         "brokerageFee": null
     },
     {
+        "id": 4,
+        "name": "IDD 1 Building",
+        "address": "111 Lý Chính Thắng, Phường 7, Quận 4",
+        "numberOfBasement": 1,
+        "rentPrice": 12,
+        "managerName": "Anh Long",
+        "managerPhone": "017345253",
+        "floorArea": 200,
+        "emptyArea": "",
+        "rentArea": "100, 400, 250",
+        "serviceFee": null,
+        "brokerageFee": null
+    },
+    {
         "id": 3,
         "name": "Alpha 2 Building Tower",
         "address": "153 nguyễn đình chiểu, Phường 6, Quận 1",
@@ -28,16 +42,30 @@
         "brokerageFee": null
     },
     {
-        "id": 4,
-        "name": "IDD 1 Building",
-        "address": "111 Lý Chính Thắng, Phường 7, Quận 4",
-        "numberOfBasement": 1,
-        "rentPrice": 12,
-        "managerName": "Anh Long",
-        "managerPhone": "017345253",
-        "floorArea": 200,
+        "id": 2,
+        "name": "ACM Tower",
+        "address": "96 cao thắng, Phường 4, Quận 2",
+        "numberOfBasement": 2,
+        "rentPrice": 18,
+        "managerName": "Chú Thuận",
+        "managerPhone": "0173546263",
+        "floorArea": 650,
         "emptyArea": "",
-        "rentArea": "100, 400, 250",
+        "rentArea": "200, 300, 400, 500",
+        "serviceFee": null,
+        "brokerageFee": null
+    },
+    {
+        "id": 32,
+        "name": "Bitexco Financial Tower",
+        "address": "Đường số 10, Phan Châu Trinh, Quận 1",
+        "numberOfBasement": 4,
+        "rentPrice": 18,
+        "managerName": "Anh Chính",
+        "managerPhone": "0987660844",
+        "floorArea": 309,
+        "emptyArea": "",
+        "rentArea": "200, 300, 400, 500",
         "serviceFee": null,
         "brokerageFee": null
     }

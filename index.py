@@ -83,7 +83,7 @@ def show_index():
         main_container = tk.Frame(current_content_frame, bg="white")
         main_container.pack(fill="both", expand=True, padx=40, pady=20)
         
-        # Banner section
+        # Banner section - Tiêu đề trước, ảnh sau
         banner_frame = tk.Frame(main_container, bg="white")
         banner_frame.pack(fill="x", pady=10)
         
@@ -102,29 +102,66 @@ def show_index():
                               command=open_login, cursor="hand2")
         cta_button.pack(pady=20)
         
-        # Hình ảnh chính
+        # Tạo một đường phân cách nhẹ
+        separator = ttk.Separator(main_container, orient='horizontal')
+        separator.pack(fill='x', pady=10)
+        
+        # Hình ảnh chính - đặt trong container riêng
+        image_section = tk.Frame(main_container, bg="white")
+        image_section.pack(fill="x", pady=20)
+        
         try:
             main_image = Image.open(building_path)
             main_image = main_image.resize((800, 400), Image.LANCZOS)
             main_photo = ImageTk.PhotoImage(main_image)
             
             # Tạo frame chứa ảnh với viền và bóng
-            image_container = tk.Frame(main_container, bd=1, relief="solid", bg="white")
-            image_container.pack(pady=20)
+            image_container = tk.Frame(image_section, bd=1, relief="solid", bg="white")
+            image_container.pack(pady=10)
             
             image_label = tk.Label(image_container, image=main_photo, bd=0)
             image_label.image = main_photo
             image_label.pack()
+            
+            # Thêm chú thích dưới ảnh
+            caption = ttk.Label(image_section, text="Tòa nhà hiện đại với đầy đủ tiện nghi", 
+                              style="Subtitle.TLabel", font=("Arial", 12, "italic"))
+            caption.pack(pady=5)
         except Exception as e:
             print(f"Lỗi khi tải ảnh chính: {e}")
-            ttk.Label(main_container, text="[Ảnh minh họa tòa nhà]", font=("Arial", 18)).pack(pady=20)
+            ttk.Label(image_section, text="[Ảnh minh họa tòa nhà]", font=("Arial", 18)).pack(pady=20)
+        
+        # Tạo một đường phân cách khác
+        separator2 = ttk.Separator(main_container, orient='horizontal')
+        separator2.pack(fill='x', pady=10)
+        
+        # Phần giới thiệu về dự án
+        intro_section = tk.Frame(main_container, bg="white")
+        intro_section.pack(fill="x", pady=20)
+        
+        intro_title = ttk.Label(intro_section, text="Về Dự Án Của Chúng Tôi", 
+                              style="Header.TLabel", font=("Arial", 20, "bold"))
+        intro_title.pack(pady=10)
+        
+        intro_text = """
+        Hệ thống Quản lý Tòa nhà là giải pháp toàn diện giúp quản lý hiệu quả các tòa nhà, 
+        chung cư và bất động sản thương mại. Với giao diện thân thiện và tính năng đa dạng, 
+        chúng tôi cung cấp công cụ hỗ trợ đắc lực cho các nhà quản lý, chủ đầu tư và ban quản lý.
+        
+        Hệ thống được phát triển dựa trên nhu cầu thực tế của thị trường, mang đến trải nghiệm 
+        quản lý chuyên nghiệp và hiệu quả nhất.
+        """
+        
+        intro_label = ttk.Label(intro_section, text=intro_text, 
+                              style="TLabel", wraplength=800, justify="center")
+        intro_label.pack(pady=10)
         
         # Phần tính năng nổi bật
         features_container = tk.Frame(main_container, bg="white")
-        features_container.pack(fill="x", pady=30)
+        features_container.pack(fill="x", pady=20)
         
-        ttk.Label(features_container, text="Tính năng nổi bật", style="Title.TLabel", 
-                 font=("Arial", 24, "bold")).pack(pady=10)
+        ttk.Label(features_container, text="Tính năng nổi bật", 
+                 style="Header.TLabel", font=("Arial", 20, "bold")).pack(pady=10)
         
         # Grid layout cho các tính năng
         features_grid = tk.Frame(features_container, bg="white")
@@ -137,6 +174,7 @@ def show_index():
             {"icon": "🔒", "title": "Bảo mật cao", "desc": "Hệ thống phân quyền và bảo mật dữ liệu chuyên nghiệp"}
         ]
         
+        # Tạo grid 2x2 cho các tính năng
         for i, feature in enumerate(features):
             col = i % 2
             row = i // 2
@@ -153,6 +191,20 @@ def show_index():
             
             desc_label = tk.Label(feature_frame, text=feature["desc"], font=("Arial", 11), bg="#F8F9FA", fg="#707070", wraplength=300)
             desc_label.pack(pady=5)
+        
+        # Phần lời kêu gọi hành động (CTA)
+        cta_section = tk.Frame(main_container, bg="#E6F7FF", height=150)
+        cta_section.pack(fill="x", pady=30)
+        cta_section.pack_propagate(False)
+        
+        cta_text = ttk.Label(cta_section, text="Sẵn sàng trải nghiệm hệ thống quản lý hiện đại?", 
+                            style="Header.TLabel", font=("Arial", 18, "bold"))
+        cta_text.pack(pady=(30, 10))
+        
+        cta_button2 = tk.Button(cta_section, text="ĐĂNG KÝ NGAY", bg="#52C41A", fg="white",
+                               font=("Arial", 14, "bold"), padx=30, pady=10, relief="flat",
+                               cursor="hand2")
+        cta_button2.pack(pady=10)
 
     def show_about_us_content():
         for widget in current_content_frame.winfo_children():
