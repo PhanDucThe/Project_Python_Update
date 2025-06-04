@@ -1,7 +1,34 @@
-{
-    "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbIltTVEFGRl0iXSwic3ViIjoibmd1eWVudmFuYiIsImlhdCI6MTc0ODM5OTkzNywiZXhwIjoxNzQ4NDE0MzM3fQ.PHPgSCGOu2yZBAZJDgMXkBji5oWuyzZ6aMgIC-6zxTI",
-    "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbIltTVEFGRl0iXSwic3ViIjoibmd1eWVudmFuYiIsImlhdCI6MTc0ODM5OTkzNywiZXhwIjoxNzQ4NDg2MzM3fQ.Q6sIC5kacxeLePsRnwDWjOhpl2dQQk6I0eNVloB4kc4",
-    "userId": 2,
-    "role": "STAFF",
-    "userName": "nguyenvanb"
-}
+[
+    {
+        "userId": 1,
+        "userName": "admin",
+        "password": "admin123",
+        "role": "MANAGER"
+    },
+    {
+        "userId": 2,
+        "userName": "nguyenvanb",
+        "password": "123456",
+        "role": "STAFF"
+    },
+    {
+        "userId": 3,
+        "userName": "nguyenvanc",
+        "password": "654321",
+        "role": "STAFF"
+    },
+    {
+        "userId": 4,
+        "userName": "nguyenvand",
+        "password": "abcdef",
+        "role": "STAFF"
+    },
+    {
+        "userId": "5",
+        "userName": "nguyenvanf",
+        "password": "123456",
+        "fullName": "Phan Đức Thể",
+        "phone": "0332180385",
+        "role": "STAFF"
+    }
+]

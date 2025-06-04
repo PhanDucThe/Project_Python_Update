@@ -1,11 +1,9 @@
 import os
 import tkinter as tk
 from PIL import Image, ImageTk
-import requests
-from utils import write_json
 import admin
 from tkinter import messagebox
-from utils import fetch_api
+import json
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(current_dir, "logo-python.png")
@@ -62,6 +60,16 @@ def show_login(main_root):
   password_entry = tk.Entry(right_frame, show="*", font=("Arial", 14))
   password_entry.pack(pady=5, ipadx=5, ipady=5)
 
+  # Checkbox hiển thị mật khẩu
+  show_password_var = tk.BooleanVar(value=False)
+  def toggle_password():
+    if show_password_var.get():
+      password_entry.config(show="")
+    else:
+      password_entry.config(show="*")
+  show_pw_cb = tk.Checkbutton(right_frame, text="Hiển thị mật khẩu", variable=show_password_var, bg="lightgray", font=("Arial", 12), command=toggle_password)
+  show_pw_cb.pack(pady=(0, 10), anchor="w", padx=30)
+
   # Tạo một frame cho nút đăng nhập và quay lại.
   button_frame = tk.Frame(right_frame, bg="lightgray")
   button_frame.pack(pady=20)
@@ -71,49 +79,25 @@ def show_login(main_root):
     main_root.deiconify()  # Hiển thị lại cửa sổ chính
 
   def login_action():
-    # Thực hiện hành động đăng nhập ở đây
-    username = username_entry.get()
-    password = password_entry.get()
-    api_url = "http://localhost:8080/auth/log-in"  # Thay bằng URL API thực tế
-    headers = {"Content-Type": "application/json"}  # Thêm header Content-Type
-    
+    username = username_entry.get().strip()
+    password = password_entry.get().strip()
+    user_file = os.path.join(current_dir, "user.json")
     try:
-      # Gửi yêu cầu POST đến API với thông tin đăng nhập và header
-      response = requests.post(api_url, json={"username": username, "password": password}, headers=headers)
-      
-      # Xử lý phản hồi từ API
-      data = response.json()
-      if data.get("status") == 200:
-        # Lấy thông tin từ phản hồi
-        messagebox.showinfo("Thành công", "Đăng nhập thành công!")
-        user_data = data.get("data", {})
-        
-        # Import os và lấy đường dẫn tuyệt đối
-        import os
-        from utils import BASE_DIR
-        
-        # Lưu thông tin vào file user.json hiện có với đường dẫn tuyệt đối
-        user_file = os.path.join(BASE_DIR, "user.json")
-        write_json(user_data, user_file)
-        
-        login_window.withdraw()  # Ẩn cửa sổ đăng nhập
-        
-        # Lấy dữ liệu tòa nhà và lưu vào file data.json hiện có
-        api_url = "http://localhost:8080/admin/building-list"
-        buildings_data = fetch_api(api_url)
-        
-        # Lấy role từ user_data và truyền vào hàm show_admin
-        role = user_data.get("role")
-        admin.show_admin(role)  # Truyền role vào hàm show_admin
-        return {"status": "success", "role": user_data.get("role")}
-      else:
-        messagebox.showerror("Thất bại", "Tài khoản hoặc mật khẩu không đúng!")
-        return {"status": "failure", "message": data.get("message", "Đăng nhập thất bại")}
+        with open(user_file, "r", encoding="utf-8") as f:
+            users = json.load(f)
     except Exception as e:
-      messagebox.showerror("Lỗi", f"Đã xảy ra lỗi: {e}")
-      return {"status": "failure", "message": str(e)}
-    # Có thể thêm mã xác thực ở đây
-    # Sau khi đăng nhập thành công, có thể đóng cửa sổ đăng nhập và hiển thị cửa sổ chính
+        messagebox.showerror("Lỗi", f"Không đọc được file user.json: {e}")
+        return
+    user = next((u for u in users if u["userName"] == username and u["password"] == password), None)
+    if user:
+        messagebox.showinfo("Thành công", "Đăng nhập thành công!")
+        with open(os.path.join(current_dir, "user_current.json"), "w", encoding="utf-8") as f:
+            json.dump(user, f, ensure_ascii=False, indent=4)
+        login_window.destroy()
+        main_root.destroy()  # Tắt hoàn toàn trang index
+        admin.show_admin(user["role"])
+    else:
+        messagebox.showerror("Thất bại", "Tài khoản hoặc mật khẩu không đúng!")
 
   # Nút đăng nhập
   login_btn = tk.Button(button_frame, text="Đăng nhập", font=("Arial", 14, "bold"), bg="blue", fg="white",

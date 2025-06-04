@@ -1,8 +1,6 @@
-
 import tkinter as tk
-from tkinter import Label, ttk  # Thêm ttk
+from tkinter import Label, ttk
 from PIL import Image, ImageTk
-import login
 import os
 
 # Lấy đường dẫn thư mục hiện tại
@@ -11,7 +9,6 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 # Sử dụng os.path.join để tạo đường dẫn đầy đủ
 logo_path = os.path.join(current_dir, "logo-python.png")
 building_path = os.path.join(current_dir, "building.jpg")
-team_path = os.path.join(current_dir, "team_placeholder.png")
 
 def show_index():
     root = tk.Tk()
@@ -21,8 +18,6 @@ def show_index():
     # Thiết lập theme cho ttk
     style = ttk.Style()
     style.theme_use('clam')  # Sử dụng theme clam cho giao diện hiện đại
-    
-    # Tùy chỉnh style cho các widget
     style.configure('TButton', font=('Arial', 12), background='#4096FF', foreground='white')
     style.configure('TLabel', font=('Arial', 11))
     style.configure('Header.TLabel', font=('Arial', 14, 'bold'), foreground='#001F54')
@@ -46,11 +41,6 @@ def show_index():
     # Tạo đường viền dưới header
     separator = ttk.Separator(root, orient='horizontal')
     separator.pack(fill='x', pady=0)
-    
-    # open_login
-    def open_login():
-        root.withdraw()
-        login.show_login(root)
     
     # Phần Logo
     try:
@@ -99,7 +89,7 @@ def show_index():
         # Nút CTA lớn
         cta_button = tk.Button(banner_frame, text="BẮT ĐẦU NGAY", bg="#4096FF", fg="white",
                               font=("Arial", 14, "bold"), padx=30, pady=10, relief="flat",
-                              command=open_login, cursor="hand2")
+                              cursor="hand2", state="disabled")
         cta_button.pack(pady=20)
         
         # Tạo một đường phân cách nhẹ
@@ -203,7 +193,7 @@ def show_index():
         
         cta_button2 = tk.Button(cta_section, text="ĐĂNG KÝ NGAY", bg="#52C41A", fg="white",
                                font=("Arial", 14, "bold"), padx=30, pady=10, relief="flat",
-                               cursor="hand2")
+                               cursor="hand2", state="disabled")
         cta_button2.pack(pady=10)
 
     def show_about_us_content():
@@ -220,20 +210,6 @@ def show_index():
                            "từ người dùng để liên tục cải thiện và phát triển sản phẩm, đảm bảo rằng "
                            "hệ thống của chúng tôi luôn đáp ứng được nhu cầu ngày càng cao của thị trường.")
         ttk.Label(current_content_frame, text=about_text_full, wraplength=800, justify="left", font=("Arial", 12)).pack(pady=10, padx=50)
-
-        # Có thể thêm ảnh đội ngũ hoặc trụ sở
-        team_image_path = team_path  # Sử dụng đường dẫn tương đối
-        try:
-            team_image = Image.open(team_image_path)
-            team_image = team_image.resize((400, 250), Image.LANCZOS)
-            team_photo = ImageTk.PhotoImage(team_image)
-            team_label = ttk.Label(current_content_frame, image=team_photo)
-            team_label.image = team_photo
-            team_label.pack(pady=20)
-        except FileNotFoundError:
-            print(f"Lỗi: Không tìm thấy file ảnh {team_image_path}.")
-        except Exception as e:
-            print(f"Lỗi khi tải ảnh đội ngũ: {e}")
 
     def show_products_content():
         for widget in current_content_frame.winfo_children():
@@ -314,25 +290,32 @@ def show_index():
         ("Tin tức", show_news_content),
         ("Liên hệ", show_contact_content)
     ]
-    
     for item_text, command_func in menu_items:
         btn = tk.Button(menu_frame, text=item_text, relief="flat", bg="#F8F9FA", fg='#001F54', 
-                        font=("Arial", 12, "bold"), command=command_func, bd=0,
+                        font=("Arial", 13, "bold"), command=command_func, bd=0,
                         activebackground="#E6F0FF", activeforeground="#0066CC",
-                        padx=15, pady=5, cursor="hand2")
-        btn.pack(side="left", padx=10)
-    
-    # Phần đăng nhập và đăng ký
+                        padx=18, pady=7, cursor="hand2")
+        btn.pack(side="left", padx=12)
+
+    # Phần đăng nhập và đăng ký (nút đăng nhập sẽ mở giao diện login)
     auth_frame = tk.Frame(header_frame, bg="#F8F9FA")
-    auth_frame.pack(side="right", padx=20)
-    
+    auth_frame.pack(side="right", padx=30)
+
+    def open_login():
+        root.withdraw()
+        import login
+        login.show_login(root)
+
+    def open_register():
+        root.withdraw()
+        import resgiter
+        resgiter.RegisterForm(root)
+
     login_btn = tk.Button(auth_frame, text="Đăng nhập", bg="#4096FF", fg="white", 
-                         font=("Arial", 12), command=open_login, padx=15, pady=5,
-                         relief="flat", cursor="hand2")
+                         font=("Arial", 12, "bold"), padx=18, pady=7, relief="flat", cursor="hand2", command=open_login)
     login_btn.pack(side="left", padx=10)
-    
     register_btn = tk.Button(auth_frame, text="Đăng ký", bg="#52C41A", fg="white", 
-                            font=("Arial", 12), padx=15, pady=5, relief="flat", cursor="hand2")
+                            font=("Arial", 12, "bold"), padx=18, pady=7, relief="flat", cursor="hand2", command=open_register)
     register_btn.pack(side="left", padx=5)
 
     # Hiển thị nội dung trang chủ mặc định khi khởi động
@@ -345,9 +328,10 @@ def show_index():
     footer_content = tk.Frame(footer_frame, bg="#001F54")
     footer_content.pack(fill="both", expand=True, padx=20, pady=10)
     
-    copyright_label = tk.Label(footer_content, 
-                              text="© 2024 Hệ thống Quản lý Tòa nhà. Mọi quyền được bảo lưu.",
-                              font=("Arial", 10), bg="#001F54", fg="white")
+    copyright_label = tk.Label(
+        footer_content, 
+        text="© 2024 Hệ thống Quản lý Tòa nhà. Mọi quyền được bảo lưu.",
+        font=("Arial", 11, "italic"), bg="#001F54", fg="white")
     copyright_label.pack(side="left", pady=10)
     
     # Thêm các liên kết mạng xã hội ở bên phải footer
@@ -355,12 +339,12 @@ def show_index():
     social_frame.pack(side="right")
     
     social_text = tk.Label(social_frame, text="Kết nối với chúng tôi:", 
-                          font=("Arial", 10), bg="#001F54", fg="white")
+                          font=("Arial", 11, "italic"), bg="#001F54", fg="white")
     social_text.pack(side="left", padx=5)
     
-    for social in ["Facebook", "Twitter", "LinkedIn"]:
-        social_btn = tk.Label(social_frame, text=social, font=("Arial", 10), 
-                             bg="#001F54", fg="#4096FF", cursor="hand2")
+    for social, color in zip(["Facebook", "Twitter", "LinkedIn"], ["#1877F3", "#1DA1F2", "#0A66C2"]):
+        social_btn = tk.Label(social_frame, text=social, font=("Arial", 11, "bold"), 
+                             bg="#001F54", fg=color, cursor="hand2")
         social_btn.pack(side="left", padx=10)
     
     return root
@@ -368,4 +352,4 @@ def show_index():
 # Nếu file này được chạy trực tiếp
 if __name__ == "__main__":
     root = show_index()
-root.mainloop()
+    root.mainloop()

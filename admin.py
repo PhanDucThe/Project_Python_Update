@@ -1,10 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
-import requests
-from utils import read_json, getRole, get_access_token, write_json, BASE_DIR
+from utils import read_json, getRole, write_json, BASE_DIR
 from tkinter import messagebox
 import os
-from createbuilding import show_create_building_form  # Import hàm từ file mới
+from createbuilding import show_create_building_form, refresh_building_list  # Import hàm từ file mới
 from editbuilding import show_edit_building_form  # Import hàm từ file mới
 
 def show_admin(role=None):
@@ -39,43 +38,31 @@ def show_admin(role=None):
       title_label = tk.Label(content_frame, text="Quản Lý Tòa Nhà", font=("Arial", 18, "bold"))
       title_label.pack(pady=20)
       
-      # Form tìm kiếm (Phía trên)
-      search_frame = tk.Frame(content_frame)
-      search_frame.pack(fill="x", padx=10, pady=5)
+      # --- Bố trí lại form tìm kiếm cho đẹp ---
+      search_frame = tk.LabelFrame(content_frame, text="Tìm kiếm tòa nhà", font=("Arial", 12, "bold"), padx=15, pady=10)
+      search_frame.pack(fill="x", padx=20, pady=10)
 
-      # Đường phân cách
-      separator = ttk.Separator(search_frame, orient='horizontal')
-      separator.grid(row=1, column=0, columnspan=6, sticky="ew", pady=10)
-
-      # Danh sách các trường nhập liệu
-      fields = {
-          "name": "Tên Tòa Nhà", 
-          "street": "Đường", 
-          "ward": "Phường",
-          "managerName": "Tên Quản Lý", 
-          "managerPhone": "SĐT Quản Lý",
-          "numberOfBasement": "Số Tầng Hầm",
-          "areaFrom": "Diện Tích Từ",
-          "areaTo": "Diện Tích Đến",
-          "rentPriceFrom": "Giá Thuê Từ",
-          "rentPriceTo": "Giá Thuê Đến"
-      }
-
+      fields = [
+          ("name", "Tên Tòa Nhà"),
+          ("street", "Đường"),
+          ("ward", "Phường"),
+          ("managerName", "Tên Quản Lý"),
+          ("managerPhone", "SĐT Quản Lý"),
+          ("numberOfBasement", "Số Tầng Hầm"),
+          ("rentPriceFrom", "Giá Thuê Từ"),
+          ("rentPriceTo", "Giá Thuê Đến")
+      ]
       entries = {}
+      num_cols = 3
+      for idx, (field_key, label) in enumerate(fields):
+          row = idx // num_cols
+          col = (idx % num_cols) * 2
+          tk.Label(search_frame, text=label, font=("Arial", 11)).grid(row=row, column=col, padx=(0,5), pady=7, sticky="e")
+          entry = tk.Entry(search_frame, width=22, font=("Arial", 11))
+          entry.grid(row=row, column=col+1, padx=(0,15), pady=7, sticky="w")
+          entries[field_key] = entry
 
-      # Chia bố cục thành từng hàng có đúng 3 trường
-      row_offset = 2  # Bắt đầu từ hàng thứ 2 sau phần tìm kiếm nhanh
-      for idx, (field_key, label) in enumerate(fields.items()):
-          row = (idx // 3) + row_offset  # Chia thành từng nhóm 3 phần tử trên mỗi hàng
-          col = (idx % 3) * 2  # Mỗi trường có 2 cột: nhãn + ô nhập
-
-          tk.Label(search_frame, text=label, font=("Arial", 12)).grid(row=row, column=col, padx=10, pady=5, sticky="w")
-          entry = tk.Entry(search_frame, width=25)
-          entry.grid(row=row, column=col + 1, padx=10, pady=5, sticky="ew")
-
-          entries[field_key] = entry  # Lưu Entry để lấy giá trị sau
-
-      # Ánh xạ giữa label hiển thị và giá trị thực tế cho quận
+      # Hàng tiếp theo cho combobox quận
       districts = {
           "Quận 1": "QUAN_1",
           "Quận 2": "QUAN_2",
@@ -86,50 +73,19 @@ def show_admin(role=None):
           "Quận Bình Thạnh": "QBT",
           "Quận Tân Bình": "QTB"
       }
-
-      # Biến lưu trạng thái của combobox quận
-      district_var = tk.StringVar()
-
-      # Thêm combobox chọn quận
-      district_row = row + 1  # Hàng tiếp theo sau các trường nhập liệu
-      tk.Label(search_frame, text="Chọn Quận:", font=("Arial", 12)).grid(row=district_row, column=0, padx=10, pady=5, sticky="w")
-
-      # Tạo danh sách các tên hiển thị
       district_labels = list(districts.keys())
-      # Combobox hiển thị danh sách quận
-      district_combobox = ttk.Combobox(search_frame, values=district_labels, state="readonly", width=25)
-      district_combobox.grid(row=district_row, column=1, padx=10, pady=5, sticky="ew")
-      
-      # Thêm callback khi giá trị combobox thay đổi
+      last_row = (len(fields)-1) // num_cols + 1
+      tk.Label(search_frame, text="Quận", font=("Arial", 11)).grid(row=last_row, column=0, padx=(0,5), pady=7, sticky="e")
+      district_combobox = ttk.Combobox(search_frame, values=district_labels, state="readonly", width=20, font=("Arial", 11))
+      district_combobox.grid(row=last_row, column=1, padx=(0,15), pady=7, sticky="w")
       def on_district_selected(event):
           selected = district_combobox.get()
-          district_code = districts.get(selected)
-          print(f"Selected district: {selected}, code: {district_code}")
-      
+          print(f"Selected district: {selected}")
       district_combobox.bind("<<ComboboxSelected>>", on_district_selected)
 
-      # Danh sách chọn nhân viên (đặt ở cùng hàng với combobox quận)
-      if role != "STAFF":
-        tk.Label(search_frame, text="Chọn Nhân Viên:", font=("Arial", 12)).grid(row=district_row, column=2, padx=10, pady=5, sticky="w")
-
-        employees = {
-            "nguyenvanb": "2",
-            "nguyenvanc": "3",
-            "nguyenvand": "4"
-        }
-        # Tạo danh sách các tên hiển thị
-        employee_labels = list(employees.keys())
-        # Combobox hiển thị danh sách nhân viên
-        employee_combobox = ttk.Combobox(search_frame, values=employee_labels, state="readonly", width=25)
-        employee_combobox.grid(row=district_row, column=3, padx=10, pady=5, sticky="ew")
-        
-        # Thêm callback khi giá trị combobox thay đổi
-        def on_employee_selected(event):
-            selected = employee_combobox.get()
-            staff_id = employees.get(selected)
-            print(f"Selected employee: {selected}, staffId: {staff_id}")
-        
-        employee_combobox.bind("<<ComboboxSelected>>", on_employee_selected)
+      # Đường phân cách
+      separator = ttk.Separator(search_frame, orient='horizontal')
+      separator.grid(row=last_row+1, column=0, columnspan=6, sticky="ew", pady=10)
 
       # Tạo bảng hiển thị kết quả (Phía dưới)
       table_frame = tk.Frame(content_frame)
@@ -178,72 +134,67 @@ def show_admin(role=None):
 
       # Hàm tìm kiếm với các tham số
       def search_with_array_param():
-          # Lấy giá trị từ các trường nhập liệu
           params = {}
           for field_key, entry in entries.items():
               value = entry.get().strip()
               if value:
-                  # Đối với các trường số, chuyển đổi thành số
-                  if field_key in ["areaFrom", "areaTo", "rentPriceFrom", "rentPriceTo", "numberOfBasement"]:
+                  if field_key in ["rentPriceFrom", "rentPriceTo", "numberOfBasement"]:
                       try:
                           params[field_key] = float(value) if "." in value else int(value)
                       except ValueError:
-                          params[field_key] = value
+                          messagebox.showwarning("Giá trị không hợp lệ", f"Trường '{field_key}' phải là số!")
+                          return
                   else:
                       params[field_key] = value
-          
-          # Thêm giá trị từ combobox quận với key là district
           selected_district = district_combobox.get()
           if selected_district:
-              district_code = districts.get(selected_district)
-              if district_code:
-                  params["district"] = district_code
-                  print(f"Adding district: {district_code}")
-          
-          # Thêm giá trị từ combobox nhân viên với key là staffId
-          if role != "STAFF":
-              selected_employee = employee_combobox.get()
-              if selected_employee:
-                  staff_id = employees.get(selected_employee)
-                  if staff_id:
-                      params["staffId"] = staff_id
-                      print(f"Adding staffId: {staff_id}")
-          
-          # Kiểm tra token
-          token = get_access_token()
-          if not token:
-              messagebox.showerror("Lỗi", "Không tìm thấy accessToken. Vui lòng đăng nhập lại.")
-              return
-          
+              params["district"] = selected_district
           try:
-              # Hiển thị thông báo đang tìm kiếm
-              messagebox.showinfo("Thông báo", "Đang tìm kiếm...")
-              
-              headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
-              
-              # Tạo URL cơ bản
-              base_url = "http://localhost:8080/admin/building-list"
-              
-              # Debug: In ra params trước khi gửi request
-              print(f"Params before request: {params}")
-              
-              # Gửi request GET đến API
-              response = requests.get(base_url, params=params, headers=headers)
-              response.raise_for_status()
-              
-              data = response.json().get("data", [])
-              load_data(data)
-              
-              # Lưu kết quả vào file data.json
               data_file = os.path.join(BASE_DIR, "data.json")
-              write_json(data, data_file)
-              
-              messagebox.showinfo("Thông báo", f"Tìm thấy {len(data)} kết quả!")
-              
-          except requests.RequestException as e:
-              messagebox.showerror("Lỗi", f"Không thể kết nối tới API: {e}")
-          except ValueError:
-              messagebox.showerror("Lỗi", "Dữ liệu trả về không hợp lệ!")
+              all_data = read_json(data_file)
+              results = []
+              for building in all_data:
+                  match = True
+                  for key, value in params.items():
+                      # So sánh số cho các trường số
+                      if key == "numberOfBasement":
+                          try:
+                              if int(building.get(key, 0)) != int(value):
+                                  match = False
+                                  break
+                          except Exception:
+                              match = False
+                              break
+                      elif key == "rentPriceFrom":
+                          try:
+                              if float(building.get("rentPrice", 0)) < float(value):
+                                  match = False
+                                  break
+                          except Exception:
+                              match = False
+                              break
+                      elif key == "rentPriceTo":
+                          try:
+                              if float(building.get("rentPrice", 0)) > float(value):
+                                  match = False
+                                  break
+                          except Exception:
+                              match = False
+                              break
+                      elif key == "district":
+                          # So sánh tên quận (không phân biệt hoa thường, loại bỏ khoảng trắng thừa)
+                          if str(value).strip().lower() not in str(building.get("district", "")).strip().lower():
+                              match = False
+                              break
+                      else:
+                          # So sánh chuỗi (không phân biệt hoa thường, tìm kiếm gần đúng)
+                          if str(value).lower() not in str(building.get(key, "")).lower():
+                              match = False
+                              break
+                  if match:
+                      results.append(building)
+              load_data(results)
+              messagebox.showinfo("Kết quả", f"Tìm thấy {len(results)} kết quả!")
           except Exception as e:
               messagebox.showerror("Lỗi", f"Đã xảy ra lỗi: {str(e)}")
 
@@ -275,93 +226,117 @@ def show_admin(role=None):
 
       # Hàm xử lý khi click vào nút "Chỉnh Sửa Tòa Nhà"
       def edit_selected_building():
-          # Lấy item được chọn từ tree
+          if role != "MANAGER":
+              messagebox.showwarning("Cảnh báo", "Bạn không có quyền chỉnh sửa tòa nhà!")
+              return
           selected_items = tree.selection()
-          
           if not selected_items:
               messagebox.showwarning("Cảnh báo", "Vui lòng chọn một tòa nhà để chỉnh sửa!")
               return
-              
-          # Lấy ID của tòa nhà được chọn
-          selected_id = tree.item(selected_items[0])['values'][0]  # Giả sử ID ở cột đầu tiên
-          
-          # Gọi hàm hiển thị form chỉnh sửa tòa nhà
+          selected_id = tree.item(selected_items[0])['values'][0]
           show_edit_building_form(admin, content_frame, selected_id)
 
       # Hàm xử lý khi click vào nút "Xóa Tòa Nhà"
       def delete_selected_building():
-          # Lấy item được chọn từ tree
+          if role != "MANAGER":
+              messagebox.showwarning("Cảnh báo", "Bạn không có quyền xóa tòa nhà!")
+              return
           selected_items = tree.selection()
-          
           if not selected_items:
               messagebox.showwarning("Cảnh báo", "Vui lòng chọn một tòa nhà để xóa!")
               return
-          
-          # Lấy ID của tòa nhà được chọn
-          selected_id = tree.item(selected_items[0])['values'][0]  # Giả sử ID ở cột đầu tiên
-          building_name = tree.item(selected_items[0])['values'][1]  # Giả sử tên tòa nhà ở cột thứ hai
-          
-          # Hiển thị hộp thoại xác nhận
+          selected_id = tree.item(selected_items[0])['values'][0]
+          building_name = tree.item(selected_items[0])['values'][1]
           confirm = messagebox.askyesno(
               "Xác nhận xóa", 
               f"Bạn có chắc chắn muốn xóa tòa nhà '{building_name}' (ID: {selected_id}) không?"
           )
-          
           if confirm:
-              # Người dùng đã xác nhận, tiến hành xóa
               delete_building_by_id(selected_id)
 
-      # Hàm gửi request xóa tòa nhà đến API
+      # Hàm xóa tòa nhà khỏi file data.json
       def delete_building_by_id(building_id):
+          if role != "MANAGER":
+              messagebox.showwarning("Cảnh báo", "Bạn không có quyền xóa!")
+              return
           try:
-              # Lấy token xác thực
-              token = get_access_token()
-              
-              if not token:
-                  messagebox.showerror("Lỗi", "Không thể xác thực. Vui lòng đăng nhập lại!")
-                  return
-              
-              # Chuẩn bị headers với token xác thực
-              headers = {
-                  "Content-Type": "application/json",
-                  "Authorization": f"Bearer {token}"
-              }
-              
-              # Tạo URL với tham số buildingIds
-              url = f"http://localhost:8080/admin/building-del/?buildingIds={building_id}"
-              
-              # Debug: In ra URL trước khi gửi request
-              print(f"Delete URL: {url}")
-              
-              # Gửi request DELETE đến API
-              response = requests.delete(url, headers=headers)
-              
-              # Kiểm tra kết quả
-              if response.status_code == 200 or response.status_code == 204:
-                  # Hiển thị thông báo thành công
-                  messagebox.showinfo("Thành công", "Xóa tòa nhà thành công!")
-                  
-                  # Cập nhật danh sách tòa nhà
-                  from createbuilding import refresh_building_list
-                  refresh_building_list(content_frame, token)
-              else:
-                  # Hiển thị thông báo lỗi
-                  try:
-                      error_data = response.json()
-                      error_message = error_data.get("message", "Lỗi không xác định")
-                      messagebox.showerror("Lỗi", f"Không thể xóa tòa nhà: {error_message}")
-                  except:
-                      messagebox.showerror("Lỗi", f"Không thể xóa tòa nhà. Mã lỗi: {response.status_code}")
-              
-          except requests.RequestException as e:
-              messagebox.showerror("Lỗi kết nối", f"Không thể kết nối đến máy chủ: {str(e)}")
+              data_file = os.path.join(BASE_DIR, "data.json")
+              all_data = read_json(data_file)
+              new_data = [b for b in all_data if str(b.get("id")) != str(building_id)]
+              write_json(new_data, data_file)
+              messagebox.showinfo("Thành công", "Xóa tòa nhà thành công!")
+              refresh_building_list(content_frame)
           except Exception as e:
               messagebox.showerror("Lỗi", f"Đã xảy ra lỗi: {str(e)}")
 
   # Tạo các nút menu
   btn1 = tk.Button(menu_frame, text="Quản lý toà nhà", font=("Arial", 14), bg="red", fg="white", command=show_building)
   btn1.pack(pady=5, fill="x") 
-  
+
+  # Thêm các chức năng Option khác
+  def show_user_management():
+      for widget in content_frame.winfo_children():
+          widget.destroy()
+      tk.Label(content_frame, text="Quản Lý Người Dùng", font=("Arial", 18, "bold")).pack(pady=20)
+      # Hiển thị danh sách user từ user.json
+      user_file = os.path.join(BASE_DIR, "user.json")
+      users = read_json(user_file)
+      columns = ("userId", "userName", "role")
+      tree = ttk.Treeview(content_frame, columns=columns, show="headings", height=10)
+      tree.pack(fill="both", expand=True, padx=20, pady=10)
+      tree.heading("userId", text="ID")
+      tree.heading("userName", text="Tên Đăng Nhập")
+      tree.heading("role", text="Phân Quyền")
+      for user in users:
+          tree.insert("", "end", values=(user.get("userId"), user.get("userName"), user.get("role")))
+      # Có thể thêm các nút Thêm/Sửa/Xóa user nếu là MANAGER
+      if role == "MANAGER":
+          user_btn_frame = tk.Frame(content_frame)
+          user_btn_frame.pack(pady=10)
+          tk.Button(user_btn_frame, text="Thêm User", font=("Arial", 12), bg="green", fg="white").pack(side="left", padx=10)
+          tk.Button(user_btn_frame, text="Sửa User", font=("Arial", 12), bg="blue", fg="white").pack(side="left", padx=10)
+          tk.Button(user_btn_frame, text="Xóa User", font=("Arial", 12), bg="red", fg="white").pack(side="left", padx=10)
+
+  def show_app_info():
+      for widget in content_frame.winfo_children():
+          widget.destroy()
+      tk.Label(content_frame, text="Thông Tin Ứng Dụng", font=("Arial", 18, "bold")).pack(pady=20)
+      info = "Ứng dụng Quản lý Tòa nhà\nPhiên bản: 1.0\nTác giả: Nhóm phát triển\nHoạt động hoàn toàn offline với file JSON."
+      tk.Label(content_frame, text=info, font=("Arial", 14), justify="left").pack(pady=10)
+
+  def show_help():
+      for widget in content_frame.winfo_children():
+          widget.destroy()
+      tk.Label(content_frame, text="Trợ Giúp & Hướng Dẫn", font=("Arial", 18, "bold")).pack(pady=20)
+      help_text = "- Đăng nhập đúng tài khoản để sử dụng.\n- STAFF chỉ được xem dữ liệu.\n- MANAGER có thể thêm/sửa/xóa.\n- Dữ liệu lưu tại các file JSON trong thư mục ứng dụng.\n- Mọi thao tác đều thực hiện trực tiếp trên máy."
+      tk.Label(content_frame, text=help_text, font=("Arial", 14), justify="left").pack(pady=10)
+
+  # Nút Option cho các chức năng khác
+  btn2 = tk.Button(menu_frame, text="Quản lý người dùng", font=("Arial", 14), bg="#007bff", fg="white", command=show_user_management)
+  btn2.pack(pady=5, fill="x")
+  btn3 = tk.Button(menu_frame, text="Thông tin ứng dụng", font=("Arial", 14), bg="#28a745", fg="white", command=show_app_info)
+  btn3.pack(pady=5, fill="x")
+  btn4 = tk.Button(menu_frame, text="Trợ giúp", font=("Arial", 14), bg="#ffc107", fg="black", command=show_help)
+  btn4.pack(pady=5, fill="x")
+
+  # Nút Logout
+  def logout():
+      # Xóa user_current.json nếu có
+      user_current_file = os.path.join(BASE_DIR, "user_current.json")
+      try:
+          if os.path.exists(user_current_file):
+              os.remove(user_current_file)
+      except Exception as e:
+          print(f"Lỗi khi xóa user_current.json: {e}")
+      admin.destroy()
+      # Import lại index.py để quay về màn hình đăng nhập
+      import subprocess, sys
+      python = sys.executable
+      subprocess.Popen([python, os.path.join(BASE_DIR, "index.py")])
+
+  btn_logout = tk.Button(menu_frame, text="Đăng xuất", font=("Arial", 14, "bold"), bg="#dc3545", fg="white", command=logout)
+  btn_logout.pack(pady=30, fill="x")
+
   # Hiển thị màn hình quản lý tòa nhà khi mở ứng dụng
   show_building()
 

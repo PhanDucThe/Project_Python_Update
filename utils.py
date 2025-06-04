@@ -1,5 +1,4 @@
 import json
-import requests
 import os
 
 # Lấy đường dẫn tuyệt đối đến thư mục chứa file
@@ -44,25 +43,9 @@ def write_json(data, filepath):
     except Exception as e:
         print(f"Lỗi khi ghi file {filepath}: {e}")
 
-def get_access_token(filepath="user.json"):
+def getRole(filepath="user_current.json"):
     """
-    Lấy accessToken từ file user.json.
-    """
-    # Chuyển đổi thành đường dẫn tuyệt đối nếu chưa phải
-    if not os.path.isabs(filepath):
-        filepath = os.path.join(BASE_DIR, filepath)
-        
-    try:
-        data = read_json(filepath)
-        return data.get("accessToken")
-    except FileNotFoundError:
-        print("File user.json không tồn tại.")
-        return None
-    
-
-def getRole(filepath="user.json"):
-    """
-    Lấy giá trị role từ file JSON.
+    Lấy giá trị role từ file user_current.json (user đang đăng nhập).
     """
     # Chuyển đổi thành đường dẫn tuyệt đối nếu chưa phải
     if not os.path.isabs(filepath):
@@ -79,30 +62,5 @@ def getRole(filepath="user.json"):
         return None
     except json.JSONDecodeError:
         print(f"File {filepath} không đúng định dạng JSON.")
-        return None
-    
-def fetch_api(api_url):
-    """
-    Gửi request với accessToken để lấy dữ liệu bảo vệ và lưu vào file data.json.
-    """
-    token = get_access_token()
-    if not token:
-        print("Không tìm thấy accessToken. Vui lòng đăng nhập lại.")
-        return
-
-    headers = {"Authorization": f"Bearer {token}"}
-    try:
-        response = requests.get(api_url, headers=headers)
-        response.raise_for_status()
-        full_data = response.json()  # Dữ liệu trả về từ API
-        buildings = full_data.get("data", [])  # Lấy danh sách tòa nhà từ key "data"
-        
-        # Sử dụng đường dẫn tuyệt đối cho file data.json
-        data_file = os.path.join(BASE_DIR, "data.json")
-        write_json(buildings, data_file)  # Lưu danh sách tòa nhà vào file data.json
-        
-        return buildings
-    except requests.RequestException as e:
-        print(f"Lỗi khi gọi API: {e}")
         return None
 
